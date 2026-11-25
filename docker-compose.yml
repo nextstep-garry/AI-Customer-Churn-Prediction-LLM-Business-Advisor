@@ -1,0 +1,93 @@
+# # One-command run:  docker compose up --build     (UI on :8501, API on :5000)
+# services:
+#   backend:
+#     build: {context: ., dockerfile: docker/backend.Dockerfile}
+#     environment:
+#       API_KEY: ${API_KEY:-}
+#       LOG_LEVEL: ${LOG_LEVEL:-INFO}
+#     volumes: [churn_data:/app/data]
+#     ports: ["5000:5000"]
+#     restart: unless-stopped
+  
+#     postgres:                                                          # optional: docker compose --profile db up -d postgres
+#     profiles: ["db"]
+#     image: postgres:16-alpine
+#     environment:
+#       POSTGRES_USER: churn
+#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-churn}                 # dev default: set a real one for anything shared
+#       POSTGRES_DB: churn
+#     volumes: [pg_data:/var/lib/postgresql/data]
+#     ports: ["127.0.0.1:5432:5432"]                                   # reachable from this machine only
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U churn -d churn"]
+#       interval: 5s
+#       retries: 10
+#     restart: unless-stopped
+
+#   frontend:
+#     build: {context: ., dockerfile: docker/frontend.Dockerfile}
+#     environment:
+#       BACKEND_URL: http://backend:5000
+#       API_KEY: ${API_KEY:-}
+#     depends_on: {backend: {condition: service_healthy}}
+#     ports: ["8501:8501"]
+#     restart: unless-stopped
+# volumes:
+#   churn_data:
+
+
+# One-command run:  docker compose up --build          (UI on :8501, API on :5000)
+# Needs a .env file next to this one (see .env.example). POSTGRES_PASSWORD is required; use letters and digits only,
+# because it is placed inside the database connection URL.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-churn}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the .env file (letters and digits only)}
+      POSTGRES_DB: ${POSTGRES_DB:-churn}
+    volumes: [pg_data:/var/lib/postgresql/data]
+    # Not published: only the backend can reach the database. To reach it from this machine, add
+    #   ports: ["127.0.0.1:5433:5432"]
+    # (5433, so it cannot clash with a PostgreSQL installed on the host).
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build: {context: ., dockerfile: docker/backend.Dockerfile}
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-churn}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-churn}
+      API_KEY: ${API_KEY:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      ALLOW_SURNAME_ACCESS: ${ALLOW_SURNAME_ACCESS:-true}
+      # assistant (RAG). Real environment variables override rag/.env
+      LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
+      LLM_MODEL: ${LLM_MODEL:-qwen2.5:3b}
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}   # Ollama running on the host machine
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    extra_hosts: ["host.docker.internal:host-gateway"]               # makes host.docker.internal work on Linux
+    volumes:
+      - hf_cache:/home/app/.cache/huggingface                        # embedding model is downloaded once, then reused
+    depends_on:
+      postgres: {condition: service_healthy}
+    ports: ["5000:5000"]
+    restart: unless-stopped
+
+  frontend:
+    build: {context: ., dockerfile: docker/frontend.Dockerfile}
+    environment:
+      BACKEND_URL: http://backend:5000
+      API_KEY: ${API_KEY:-}
+    depends_on:
+      backend: {condition: service_healthy}
+    ports: ["8501:8501"]
+    restart: unless-stopped
+
+volumes:
+  hf_cache:
+  pg_data:

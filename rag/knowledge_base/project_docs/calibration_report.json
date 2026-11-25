@@ -1,0 +1,42 @@
+{
+  "split": {
+    "train": 6996,
+    "validation": 1000,
+    "test": 1999
+  },
+  "method": "Platt scaling on validation split",
+  "test": {
+    "roc_auc_raw": 0.8605496771325918,
+    "roc_auc_calibrated": 0.8605496771325918,
+    "brier_raw": 0.16267303554949022,
+    "brier_calibrated": 0.10089403448077768,
+    "ece_raw": 0.2384179353102736,
+    "ece_calibrated": 0.026765864014630575,
+    "mean_predicted_raw": 0.4244327445203749,
+    "mean_predicted_calibrated": 0.20760307262545294,
+    "observed_churn": 0.2036018009004502
+  },
+  "test_tiers": [
+    {
+      "tier": "Low",
+      "customers": 1224,
+      "observed_churn": 0.06535947712418301
+    },
+    {
+      "tier": "Medium",
+      "customers": 413,
+      "observed_churn": 0.18886198547215496
+    },
+    {
+      "tier": "High",
+      "customers": 362,
+      "observed_churn": 0.6878453038674033
+    }
+  ],
+  "threshold": {
+    "raw": 0.5,
+    "calibrated_equivalent": 0.21972846415874794,
+    "validation_f1_optimal_calibrated": 0.28,
+    "validation_f1_at_chosen": 0.6186770428015564
+  }
+}

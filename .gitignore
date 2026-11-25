@@ -1,0 +1,28 @@
+# environments and caches (the original repo shipped ~970 MB of these)
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+# secrets and runtime data
+.env
+/data/
+*.sqlite3
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.bak
+rag/chroma_db/
+.ipynb_checkpoints/
+# added before the first GitHub upload
+.env.*
+!.env.example
+**/.env
+!**/.env.example
+**/venv/
+data/
+data_backup/
+churn_data_backup/
+tool_eval_results.csv

@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "model_name": "XGBoost",
+  "model_version": "1.1.0",
+  "description": "XGBoost bank-customer churn classifier (notebook Sections 1-25). Platt-calibrated: the score is a probability.",
+  "created_at": "2026-09-21T07:24:10+00:00",
+  "trained_with": {
+    "scikit-learn": "1.6.1",
+    "xgboost": "3.4.1",
+    "joblib": "1.6.0"
+  },
+  "threshold": 0.21972846415874794,
+  "feature_names": [
+    "CreditScore",
+    "Gender",
+    "Age",
+    "Tenure",
+    "Balance",
+    "NumOfProducts",
+    "HasCrCard",
+    "IsActiveMember",
+    "EstimatedSalary",
+    "Zero_Balance_Flag",
+    "Balance_Salary_Ratio",
+    "Geography_germany",
+    "Geography_spain"
+  ],
+  "artifacts": {
+    "model": {
+      "file": "xgb_model.json",
+      "sha256": "f838c54b9f4ca9eaf63b2787935b0dd1939653f90c7346a128f8411bb6068476"
+    },
+    "preprocessing": {
+      "file": "preprocessing.pkl",
+      "sha256": "8d4929b0d9f276c54dee90f355268f51c51701aef6a0f3bb36331444e66df054"
+    },
+    "calibrator": {
+      "file": "calibrator.pkl",
+      "sha256": "4a3080a30f4056f8240810cbe8000a4ed6b3fa763cf9f272b27685a244a49835"
+    }
+  },
+  "metrics": {
+    "source": "Notebook output, reproduced exactly from the raw CSV in audit report section 8.1",
+    "split": {
+      "train": 6996,
+      "validation": 1000,
+      "test": 1999,
+      "stratified": true,
+      "seed": 42
+    },
+    "best_iteration": 62,
+    "validation_roc_auc": 0.8664,
+    "test": {
+      "roc_auc": 0.8605,
+      "f1": 0.607,
+      "precision": 0.51,
+      "recall": 0.749,
+      "accuracy": 0.8024,
+      "threshold": 0.5
+    },
+    "calibration_test_uncalibrated": {
+      "brier": 0.1627,
+      "ece": 0.239
+    },
+    "calibration_test": {
+      "roc_auc_raw": 0.8605496771325918,
+      "roc_auc_calibrated": 0.8605496771325918,
+      "brier_raw": 0.16267303554949022,
+      "brier_calibrated": 0.10089403448077768,
+      "ece_raw": 0.2384179353102736,
+      "ece_calibrated": 0.026765864014630575,
+      "mean_predicted_raw": 0.4244327445203749,
+      "mean_predicted_calibrated": 0.20760307262545294,
+      "observed_churn": 0.2036018009004502
+    }
+  },
+  "training_ranges": {
+    "source": "Exact min/max of the notebook-cleaned data, all splits (9,995 rows); reproduced by training/notebook_cleaning.py",
+    "CreditScore": [
+      350.0,
+      850.0
+    ],
+    "Age": [
+      18.0,
+      92.0
+    ],
+    "Tenure": [
+      0.0,
+      10.0
+    ],
+    "Balance": [
+      0.0,
+      250898.09
+    ],
+    "NumOfProducts": [
+      1.0,
+      4.0
+    ],
+    "EstimatedSalary": [
+      11.58,
+      199992.48
+    ]
+  },
+  "risk_tiers": {
+    "labels": [
+      "Low",
+      "Medium",
+      "High"
+    ],
+    "cutoffs": [
+      0.15,
+      0.4
+    ],
+    "basis": "calibrated",
+    "note": "Cut-offs on the CALIBRATED probability (audit 8.3b). Observed churn on the held-out test split: Low 6.5%, Medium 18.9%, High 68.8%."
+  },
+  "known_limitations": [
+    "The 0.5 threshold is a grid-boundary artifact of the notebook's threshold sweep (audit report section 8.2), not a tuned optimum.",
+    "Winsorisation clips discrete features (e.g. NumOfProducts to 3.5), so 3- and 4-product customers are treated alike.",
+    "The calibrator was fit on 1,000 validation rows; expect roughly +/-3 points of noise in each probability band.",
+    "The flag threshold keeps the original decision boundary (the calibrated value of the old raw 0.5) and is not re-tuned."
+  ]
+}

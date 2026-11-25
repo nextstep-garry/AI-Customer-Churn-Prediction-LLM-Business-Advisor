@@ -1,0 +1,7 @@
+# RAG assistant. Install with:  pip install -r requirements.txt  (used by backend/churn_api/api/chat.py)
+sentence-transformers>=3.0      # embeddings (Hugging Face); also installs torch and transformers
+chromadb>=1.0                   # persistent vector store
+python-dotenv>=1.0              # reads the .env file
+requests>=2.31                  # talks to Ollama / OpenAI / Gemini
+numpy>=1.26
+# Only needed if LLM_PROVIDER=huggingface:  transformers and torch (installed with sentence-transformers)

@@ -1,0 +1,18 @@
+@'
+# Keep virtual environments, secrets, customer data and test junk out of the Docker build.
+**/venv
+**/.venv
+**/__pycache__
+**/*.pyc
+.git
+.github
+.pytest_cache
+tests
+data
+data_backup
+
+# Secrets: the .env in the project root holds the real database password. rag/.env only selects the LLM.
+.env
+**/.env
+!rag/.env
+'@ | Set-Content -Encoding utf8 .dockerignore

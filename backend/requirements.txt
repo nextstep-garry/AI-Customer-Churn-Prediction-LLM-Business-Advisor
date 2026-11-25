@@ -1,0 +1,16 @@
+# Runtime dependencies, pinned to the versions the model artifacts were built and tested with.
+# scikit-learn MUST stay at 1.6.1: preprocessing.pkl was pickled with it and the API refuses to
+# start on a different major.minor (see models/model_manifest.json -> trained_with).
+flask==3.0.3
+werkzeug==3.1.8
+pandas==3.0.2
+numpy==2.5.3
+scikit-learn==1.6.1
+xgboost==3.4.1
+joblib==1.6.0
+pydantic==2.13.5
+waitress==3.0.2                      # Windows-friendly production server
+gunicorn==26.2.0; sys_platform != "win32"
+sqlalchemy==2.1.4                    # PostgreSQL access (used only when DATABASE_URL is set)
+psycopg[binary]==3.3.6               # PostgreSQL driver; the binary wheel bundles libpq, no system install
+-r ../rag/requirements.txt

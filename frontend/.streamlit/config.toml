@@ -1,0 +1,9 @@
+[server]
+maxUploadSize = 50            # MB; keep in step with the backend's MAX_UPLOAD_MB
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+primaryColor = "#2f6fed"

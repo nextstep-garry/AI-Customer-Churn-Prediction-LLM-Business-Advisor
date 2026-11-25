@@ -1,0 +1,4 @@
+# Everything needed to run the full test suite in one virtualenv:  pip install -r requirements-dev.txt
+-r backend/requirements.txt
+-r frontend/requirements.txt
+pytest==9.1.1
